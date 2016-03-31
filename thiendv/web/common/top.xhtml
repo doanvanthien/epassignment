@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <style type="text/css">
+
+        #p_commandLinkid{
+            height: 25px;
+            margin-bottom: auto;
+            margin-top: auto;
+            font-size: 15px;
+        }
+
+    </style>
+    <ui:composition 
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+        <link href="#{request.contextPath}/styles/css/top.css" rel="stylesheet" type="text/css"/>
+
+        <h:form id="form_main_top">
+            <p:messages id="messages-error" closable="true" />
+            <div>
+                <h:commandLink style="margin-bottom: auto; margin-right: auto;" >
+                    <img src="#{request.contextPath}/styles/images/LOGO.PNG" alt="LOGO" class="logo"/>
+                </h:commandLink>
+<!--                <p:commandButton value="#{PP_USER.add}" style=" height: 25px; margin-bottom: auto; margin-top: auto; font-size: 15px;" icon="ui-icon-plus" rendered="#{userController.isLogin}" />
+                <p:commandLink id="change-password" style="font-size: 11px;" type="button" value="#{PP_USER.change_password}" onclick="PF('dialog-change-password').show();" />
+                <p:commandButton id="logout" style=" height: 25px; margin-bottom: auto; margin-top: auto; font-size: 15px;" type="button" value="#{PP_USER.logout}" icon="ui-icon-power" onclick="PF('dialog').show();"/>-->
+            </div>
+<!--            <div id="dialog">
+                <p:dialog widgetVar="dialog" header="#{PP_USER.alert_logout}"   >
+                    <p:commandButton value="#{PP_USER.yes}" action="#{userController.logout(event)}" process="@this" oncomplete="PF('dialog').hide();" 
+                                     style="float: left;" icon="ui-icon-check"
+                                     />
+                    <p:commandButton value="#{PP_USER.no}" oncomplete="PF('dialog').hide();" icon="ui-icon-close" />
+                </p:dialog>
+                <p:dialog widgetVar="dialog-change-password" header="#{PP_USER.change_password}">
+                    <p:panel id="panel_change_password">
+                        <p:panelGrid columns="2" id="panel_grid_change_password" >
+                            <h:outputText value="#{PP_USER.old_password}" />
+                            <p:password id="old_password" value="#{userController.mpassword.currentPassword}" required="true" requiredMessage="Nhập mật khẩu cũ" >
+                                <f:validateRequired for="old_password" />
+                                <p:message id="message-error-old-password" for="old_password"  />
+                                <p:ajax event="blur" listener="#{userController.checkOldPassword(event)}" update=" :form_main_top:messages-error :form_main_top:message-error-old-password :form_main_top:new_password " />
+                            </p:password>
+
+                            <h:outputText value="Mật khẩu mới" />
+                            <p:password id="new_password" value="#{userController.mpassword.newPassword}" required="true" requiredMessage="Nhập mật khẩu mới" >
+                                <f:validateRequired for="new_password" />
+                                <p:ajax event="blur" update=":form_main_top:new_repeat_password" />
+                            </p:password>
+
+                            <h:outputText value="Nhập lại mật khẩu mới" />
+                            <p:password id="new_repeat_password" value="#{userController.mpassword.repeatNewPassword}" required="true" requiredMessage="Nhập lại mật khẩu mới" >
+                                <f:validateRequired for="new_repeat_password" />
+                                <p:message id="message-error-new-repeat-password" for="new_repeat_password" />
+                            </p:password>
+
+                            <p:commandButton value="Ghi nhận" icon="ui-icon-disk" process="@this, :form_main_top:panel_change_password " actionListener="#{userController.saveChangePassword(event)}" />
+                        </p:panelGrid>
+                    </p:panel>
+                </p:dialog>
+            </div>-->
+        </h:form>
+    </ui:composition>
+</html>

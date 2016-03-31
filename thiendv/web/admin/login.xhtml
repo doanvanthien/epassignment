@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Login my love</title>
+        <link rel="icon" href="styles/images/logo.ico" />
+    </h:head>
+    <h:body>
+        <h:form id="form_main">
+            <p:messages id="messages-error" />
+            <p:panel id="panel_login" style="margin: auto; width: 300px;" >
+                <h3>Login system</h3><br/>
+                <h:outputText value="Username" />
+                <p:inputText id="username" value="#{userController.muser.username}" required="true" requiredMessage="Please, enter username" >
+                    <f:validateRequired for="username" />
+                </p:inputText>
+                <p:watermark for="username" value="Your username" />
+                <br/>
+                <h:outputText value="Password" />
+                <p:password id="password" value="#{userController.muser.password}" required="true" requiredMessage="Please, enter username" >
+                    <f:validateRequired for="password" />
+                </p:password>
+                <p:watermark for="password" value="Your password" />
+                <br/>
+                <p:commandButton icon="" value="Login" actionListener="#{userController.login(event)}" process="@this, :form_main:panel_login" update=":form_main:messages-error" />                
+            </p:panel>
+        </h:form>
+    </h:body>
+</html>
+
