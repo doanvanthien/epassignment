@@ -2,24 +2,27 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>My love</title>
         <link rel="icon" href="styles/images/logo.ico" />
         <link href="#{request.contextPath}/styles/css/template.css" rel="stylesheet" type="text/css"/>
     </h:head>
     <h:body>
-        <ui:composition template="admin/template.xhtml">
-            <ui:define name="menu">
-                <ui:include src="/common/top.xhtml" />
-            </ui:define>
-            <ui:define name="center">
-                <ui:include src="/common/center.xhtml" />
-            </ui:define>
-            <ui:define name="bottom">
-                <ui:include src="/common/bottom.xhtml" />
-            </ui:define>
-        </ui:composition>
+        <h:form>
+            <ui:composition template="admin/template.xhtml">
+                <ui:define name="menu">
+                    <ui:include src="/common/top.xhtml" />
+                </ui:define>
+                <ui:define name="center">
+                    <ui:include src="/common/center.xhtml" />
+                </ui:define>
+                <ui:define name="bottom">
+                    <ui:include src="/common/bottom.xhtml" />
+                </ui:define>
+            </ui:composition>
+        </h:form>
     </h:body>
 </html>
 

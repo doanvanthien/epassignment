@@ -3,11 +3,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
     <f:view> 
         <h:head>
-            <title>My love</title>
-            <link rel="icon" href="styles/images/logo.ico" />
+            <title>Home</title>
+            <link rel="icon" href="styles/images/logo_main.ico" />
             <link href="#{request.contextPath}/styles/css/template.css" rel="stylesheet" type="text/css"/>
         </h:head>
         <h:body id="body-template">
@@ -16,6 +17,10 @@
                     <ui:insert name="menu" >
                         Default menu
                     </ui:insert>
+                    <h:form id="form_main_header">
+                        <p:menubar id="menu_abc_xyz" model="#{menuController.menuModel}"  >                
+                        </p:menubar>
+                    </h:form>
                 </div>
                 <!-- menu here -->
                 <ui:insert name="center" >
@@ -25,7 +30,26 @@
                     Default bottom
                 </ui:insert>
             </div>
+            <p:ajaxStatus onstart="widget_statusDialog.show();" onsuccess="widget_statusDialog.hide();"/>
+
+            <p:dialog id="status_dialog" modal="true" widgetVar="widget_statusDialog" header="Đang xử lý..." draggable="false" closable="false" resizable="false" >
+                <div style="text-align: center">
+                    <p class="loader" id="loading_mask_loader">
+                        <img src="#{request.contextPath}/styles/images/loader.gif" />
+                    </p>
+                </div>
+            </p:dialog>
         </h:body>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('#form_main_header .ui-menuitem-link').each(function () {
+                    $("#form_main_header ul li").click(function () {
+                        $("#form_main_header ul li").removeClass("selected");
+                        $(this).addClass("selected");
+                    });
+                });
+            });
+        </script>
     </f:view>
 </html>
 

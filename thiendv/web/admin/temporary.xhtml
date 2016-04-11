@@ -1,0 +1,148 @@
+
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <f:view contentType="text/html">
+        <h:body>
+            <ui:composition 
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+                <link href="#{request.contextPath}/styles/css/top.css" rel="stylesheet" type="text/css"/>
+
+                <h:form id="form_main_top">
+                    <p:growl id="messages-error"  />
+                    <p:commandLink id="login"  rendered="#{!userController.isLogin}"  oncomplete="PF('login').show();"   style="float: right;" >Login</p:commandLink> <!-- icon="ui-icon-arrowthickstop-1-e" -->
+                    <p:commandLink id="logout"  onclick="PF('logout').show();" 
+                                   rendered="#{userController.isLogin}"  >Logout</p:commandLink> <!-- icon="ui-icon ui-icon-power" -->
+                    <br clear="both"/>
+
+                    <p:dialog id="dialog_login" widgetVar="login" closable="false" header="Login" resizable="false">
+                        <p:panelGrid id="panelGrid_login" style="margin: auto; border: 0px;" >
+                            <p:row>
+                                <p:column style="width: 50%">
+                                    <h:outputText value="Username"  />
+                                </p:column>
+                                <p:column style="width: 50%">
+                                    <p:inputText id="username" value="#{userController.muser.username}" required="true" requiredMessage="Username is not empty" >
+                                    </p:inputText>
+                                    <p:message for="username" display="tooltip" />
+                                    <p:watermark for="username" value="Username" />
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column style="width: 50%">
+                                    <h:outputText value="Password" />
+                                </p:column>
+                                <p:column style="width: 50%">
+                                    <p:password id="password" value="#{userController.muser.password}" required="true" requiredMessage="Password is not empty" >
+                                    </p:password>
+                                    <p:message for="password" display="tooltip" />
+                                    <p:watermark for="password" value="Password" />
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column colspan="2" style="text-align: center;">
+                                    <p:commandButton value="Login" oncomplete="handleLoginRequest(xhr, status, args)"
+                                                     actionListener="#{userController.login(event)}" process="@this, :form_main_top:panelGrid_login" update=":form_main_center :form_main_top:messages-error" />
+                                    <p:commandButton value="Cancel" process="@this" update=":form_main_top:panelGrid_login" onclick="PF('login').hide();" />
+                                </p:column>
+                            </p:row>
+                        </p:panelGrid>
+                    </p:dialog>
+                    <p:confirmDialog widgetVar="logout" header="Do you want to logout?" >
+                        <p:commandButton value="Yes" actionListener="#{userController.logout(event)}" process="@this" update="form_main_top :form_main_center" />
+                        <p:commandButton value="No" onclick="PF('logout').hide();" />
+                    </p:confirmDialog>
+                </h:form>
+                <script type="text/javascript">
+                    function handleLoginRequest(xhr, status, args) {
+                        if (args.validationFailed || !args.loggedIn) {
+                            PF('dialog_login').jq.effect("shake", {times: 5}, 100);
+                        } else {
+                            PF('dialog_login').hide();
+                            $('#loginLink').fadeOut();
+                        }
+                    }
+                </script>
+            </ui:composition>
+        </h:body>
+    </f:view>
+</html>
+
+<!--
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:body>
+        <ui:composition 
+            xmlns="http://www.w3.org/1999/xhtml"
+            xmlns:f="http://xmlns.jcp.org/jsf/core"
+            xmlns:h="http://xmlns.jcp.org/jsf/html"
+            xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+            <link href="#{request.contextPath}/styles/css/top.css" rel="stylesheet" type="text/css"/>
+
+            <h:form id="form_main_top">
+                <p:growl id="messages-error"  />
+                <p:commandButton id="login" value="Login" rendered="#{!userController.isLogin}" oncomplete="PF('login').show();"  icon="ui-icon-arrowthickstop-1-e" style="float: right;" />
+                <p:commandButton id="logout" icon="ui-icon ui-icon-power" onclick="PF('logout').show();"
+                                 value="Logout"  rendered="#{userController.isLogin}"  />
+                <br clear="both"/>
+
+                <p:dialog id="dialog_login" widgetVar="login"  header="Login" resizable="false" 
+                          visible="true" rendered="#{!userController.isLogin}">
+                    <p:panelGrid id="panelGrid_login" style="margin: auto; border: 0px;" >
+                        <p:row>
+                            <p:column style="width: 50%">
+                                <h:outputText value="Username"  />
+                            </p:column>
+                            <p:column style="width: 50%">
+                                <p:inputText id="username" value="#{userController.muser.username}" required="true" requiredMessage="Username is not empty" >
+                                </p:inputText>
+                                <p:message for="username" display="tooltip" />
+                                <p:watermark for="username" value="Username" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column style="width: 50%">
+                                <h:outputText value="Password" />
+                            </p:column>
+                            <p:column style="width: 50%">
+                                <p:password id="password" value="#{userController.muser.password}" required="true" requiredMessage="Password is not empty" >
+                                </p:password>
+                                <p:message for="password" display="tooltip" />
+                                <p:watermark for="password" value="Password" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column colspan="2" style="text-align: center;">
+                                <p:commandButton value="Login" 
+                                                  actionListener="#{userController.login(event)}" process="@this, :form_main_top:panelGrid_login" update=":form_main_top:messages-error form_main_top" />                
+                                <p:commandButton value="Cancel" process="@this" update=":form_main_top:panelGrid_login" onclick="PF('login').hide();" />
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                </p:dialog>
+                <p:confirmDialog widgetVar="logout" header="Do you want to logout?" >
+                    <p:commandButton value="Yes" actionListener="#{userController.logout(event)}" process="@this" update="form_main_top :form_main_center" />
+                    <p:commandButton value="No" onclick="PF('logout').hide();" />
+                </p:confirmDialog>
+            </h:form>
+        </ui:composition>
+    </h:body>
+</html>
+
+
+
+
+-->
