@@ -8,7 +8,11 @@ package model;
 import entity.User;
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import util.JsfUtil;
 
 /**
  *
@@ -86,6 +90,7 @@ public class UserModel extends ConnectionPool implements Serializable {
 
     public int changePassword(String newPassword, int user_id) throws IOException, ClassNotFoundException, SQLException {
         int iResult = -1;
+        
         openConnection();
         String strSql = "update users set password = CONVERT(VARCHAR(32), HashBytes('MD5', '" + newPassword + "'), 2) where id = " + user_id;
         mpreparedStatement = connection.prepareStatement(strSql);
@@ -95,4 +100,33 @@ public class UserModel extends ConnectionPool implements Serializable {
         return iResult;
     }
 
+    public List<User> getAllUser() throws IOException, ClassNotFoundException, SQLException {
+        List<User> result = new ArrayList<>();
+        String strSql = "select * from users";
+        openConnection();
+        mpreparedStatement = connection.prepareStatement(strSql);
+        mresultSet = mpreparedStatement.executeQuery();
+        while (mresultSet.next()) {
+            User user = new User();
+            user.setUsername(mresultSet.getString("username"));
+            user.setEmail(mresultSet.getString("email"));
+            result.add(user);
+        }
+        closeAll();
+        return result;
+    }
+    
+    public int addUser(User user) throws IOException, ClassNotFoundException, SQLException, NoSuchAlgorithmException {
+        int result = -1;
+        String password = JsfUtil.convertToMD5(user.getPassword());
+        String strSql = "insert into users(username,password,email) values(?,?,?)";
+        openConnection();
+        mpreparedStatement = connection.prepareStatement(strSql);
+        mpreparedStatement.setString(1, user.getUsername());
+        mpreparedStatement.setString(2, password);
+        mpreparedStatement.setString(3, user.getEmail());
+        result = mpreparedStatement.executeUpdate();
+        closeAll();
+        return result;
+    }
 }

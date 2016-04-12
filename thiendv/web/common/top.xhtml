@@ -15,6 +15,10 @@
 
             <h:form id="form_main_top">
                 <p:growl id="messages-error"  />
+                <p:commandLink id="link_create_account" value="Create Account? " rendered="#{userController.isLogin}"  onclick="PF('dialog_create_account').show();" /> 
+                <h:outputText value="||" rendered="#{userController.isLogin}" />
+                <p:commandLink id="link_change_password" value="Change password? " onclick="PF('change_password').show();"  rendered="#{userController.isLogin}" />
+                <h:outputText value="||" rendered="#{userController.isLogin}" />
                 <p:commandButton id="login" value="Login" rendered="#{!userController.isLogin}" oncomplete="PF('login').show();"  icon="ui-icon-arrowthickstop-1-e" style="float: right;" />
                 <p:commandButton id="logout" icon="ui-icon ui-icon-power" onclick="PF('logout').show();"
                                  value="Logout"  rendered="#{userController.isLogin}"  />
@@ -24,22 +28,22 @@
                           visible="true" rendered="#{!userController.isLogin}">
                     <p:panelGrid id="panelGrid_login" style="margin: auto; border: 0px;" >
                         <p:row>
-                            <p:column style="width: 50%">
+                            <p:column style="width: 50%; text-align: left;">
                                 <h:outputText value="Username"  />
                             </p:column>
-                            <p:column style="width: 50%">
-                                <p:inputText id="username" value="#{userController.muser.username}" required="true" requiredMessage="Username is not empty" >
+                            <p:column style="width: 50%;">
+                                <p:inputText id="username" value="#{userController.muser.username}" required="true" requiredMessage="Username not empty" >
                                 </p:inputText>
                                 <p:message for="username" display="tooltip" />
                                 <p:watermark for="username" value="Username" />
                             </p:column>
                         </p:row>
                         <p:row>
-                            <p:column style="width: 50%">
+                            <p:column style="width: 50%; text-align: left;">
                                 <h:outputText value="Password" />
                             </p:column>
                             <p:column style="width: 50%">
-                                <p:password id="password" value="#{userController.muser.password}" required="true" requiredMessage="Password is not empty" >
+                                <p:password id="password" value="#{userController.muser.password}" required="true" requiredMessage="Password not empty" >
                                 </p:password>
                                 <p:message for="password" display="tooltip" />
                                 <p:watermark for="password" value="Password" />
@@ -48,8 +52,84 @@
                         <p:row>
                             <p:column colspan="2" style="text-align: center;">
                                 <p:commandButton value="Login" 
-                                                 actionListener="#{userController.login(event)}" process="@this, :form_main_top:panelGrid_login" update=":form_main_top:messages-error form_main_top" />                
+                                                 actionListener="#{userController.login(event)}" process="@this, :form_main_top:panelGrid_login" update=" :form_main_center :form_main_top:messages-error form_main_top" />                
                                 <p:commandButton value="Cancel" process="@this" update=":form_main_top:panelGrid_login" onclick="PF('login').hide();" />
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                </p:dialog>
+                <p:dialog id="dialog_change_password" widgetVar="change_password"  header="Login" resizable="false" >
+                    <p:panelGrid id="panel_grid_change_password" style="margin: auto; border: 0px; text-align: left;" >
+                        <p:row>
+                            <p:column style="width: 50%; text-align: left;">
+                                <h:outputText value="Old password"  />
+                            </p:column>
+                            <p:column style="width: 50%;">
+                                <p:password id="old_password" value="#{userController.mpassword.currentPassword}" >
+                                    <p:ajax  listener="#{userController.checkOldPassword(event)}" update=":form_main_top:messages-error"  />
+                                </p:password>
+                                <p:watermark for="old_password" value="Old password" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column style="width: 50%; text-align: left;">
+                                <h:outputText value="New password"  />
+                            </p:column>
+                            <p:column style="width: 50%;">
+                                <p:password id="new_password" value="#{userController.mpassword.newPassword}" >
+                                </p:password>
+                                <p:watermark for="new_password" value="New password" />
+                                <p:focus  for="new_password" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column style="width: 50%; text-align: left;">
+                                <h:outputText value="Repeat new password"  />
+                            </p:column>
+                            <p:column style="width: 50%;">
+                                <p:password id="repeat_new_password" value="#{userController.mpassword.repeatNewPassword}" >
+                                    <p:ajax event="blur" process="@this :form_main_top:panel_grid_change_password" listener="#{userController.checkNewPassword(event)}" update=":form_main_top:messages-error :form_main_top:save_change_password" />
+                                </p:password>
+                                <p:watermark for="repeat_new_password" value="Repeat new password" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column colspan="2" style="text-align: center;">
+                                <p:commandButton id="save_change_password" icon="ui-icon-disk" value="Save" disabled="#{!userController.inputChangePasswordCorrect}" 
+                                                 actionListener="#{userController.saveChangePassword(event)}" process="@this :form_main_top:panel_grid_change_password" update=":form_main_top:messages-error form_main_top" />
+                                <p:commandButton icon="ui-icon-close" value="Cancel" onclick="PF('dialog_change_password').hide();" />
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                </p:dialog>
+                <p:dialog id="create_account" widgetVar="dialog_create_account" resizable="false" >
+                    <p:panelGrid id="panel_grid_create_account" style="margin: auto; border: 0px; text-align: left;" >
+                        <p:row>
+                            <p:column style="width: 50%; text-align: left;">
+                                <h:outputText value="Username" />
+                            </p:column>
+                            <p:column style="width: 50%;">
+                                <p:inputText id="create_username" required="true" value="#{userController.mcreateUser.username}"  >
+                                    <p:ajax listener="#{userController.checkUser(event)}" update=":form_main_top:messages-error :form_main_top:panel_grid_create_account :form_main_top:save_create_account" />
+                                </p:inputText>
+                                <p:watermark for="create_username" value="Username" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column style="width: 50%; text-align: left;">
+                                <h:outputText value="Email" />
+                            </p:column>
+                            <p:column style="width: 50%;">
+                                <p:inputText id="create_email" required="true" value="#{userController.mcreateUser.email}" validatorMessage="Invalid email format"  >
+                                    <p:ajax listener="#{userController.checkEmail(event)}" update=":form_main_top:messages-error :form_main_top:panel_grid_create_account :form_main_top:save_create_account" />
+                                    <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                </p:inputText>
+                                <p:watermark for="create_email" value="Email" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column colspan="2" style="text-align: center;">
+                                <p:commandButton id="save_create_account" value="Save" actionListener="#{userController.createAccount(event)}" icon="ui-icon-disk" disabled="#{userController.mcreateUser.username == null || userController.mcreateUser.email == null  }" process="@this :form_main_top:panel_grid_create_account" update=":form_main_top:messages-error form_main_top" />
                             </p:column>
                         </p:row>
                     </p:panelGrid>

@@ -5,6 +5,10 @@
  */
 package util;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.NavigationHandler;
 import javax.faces.context.FacesContext;
@@ -16,6 +20,22 @@ import javax.servlet.http.HttpSession;
  * @author thiendv
  */
 public class JsfUtil {
+
+    public static String convertToMD5(String string) throws NoSuchAlgorithmException {
+
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        md.update(string.getBytes());
+
+        byte byteData[] = md.digest();
+
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < byteData.length; i++) {
+            sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        String result = sb.toString().toUpperCase();
+
+        return result;
+    }
 
     public static HttpServletRequest getRequest() {
         return (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -91,5 +111,15 @@ public class JsfUtil {
         FacesContext.getCurrentInstance().addMessage(
                 null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, message, ""));
+    }
+
+    public static String randomPassword() {
+        String result = "1";
+        while (result.length() != 5) {
+            SecureRandom random = new SecureRandom();
+            result = new BigInteger(16, random).toString(10);
+        }
+
+        return result;
     }
 }

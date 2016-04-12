@@ -10,7 +10,9 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import model.*;
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
@@ -19,6 +21,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpSession;
 import org.primefaces.context.RequestContext;
 import util.JsfUtil;
+import util.MailServer;
 
 /**
  *
@@ -29,14 +32,18 @@ import util.JsfUtil;
 public class UserController implements Serializable {
 
     private User muser;
+    private User mcreateUser;
     private UserModel muserModel;
     private boolean isLogin;
     private Password mpassword;
+    private boolean inputChangePasswordCorrect;
+    private List<User> musers;
 
     public UserController() {
         try {
             muserModel = new UserModel();
             isLogin = false;
+            inputChangePasswordCorrect = false;
             mpassword = new Password();
             HttpSession session = JsfUtil.getSession();
             muser = (User) session.getAttribute("user");
@@ -48,7 +55,8 @@ public class UserController implements Serializable {
             } else {
                 muser = new User();
             }
-
+            mcreateUser = new User();
+            musers = muserModel.getAllUser();
         } catch (IOException | ClassNotFoundException | SQLException ex) {
             Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -62,6 +70,7 @@ public class UserController implements Serializable {
             if (muserModel.validate(muser.getUsername(), muser.getPassword())) {
                 loggedIn = true;
                 JsfUtil.setSessionValue("user", muser);
+                muser = muserModel.getUser(muser.getUsername());
                 isLogin = true;
             } else {
                 loggedIn = false;
@@ -73,11 +82,6 @@ public class UserController implements Serializable {
         } catch (IOException | ClassNotFoundException | SQLException ex) {
             Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-    }
-
-    public void test(ActionEvent event) {
-        System.out.println("here");
 
     }
 
@@ -95,12 +99,13 @@ public class UserController implements Serializable {
      */
     public void checkOldPassword(AjaxBehaviorEvent event) {
         try {
-            String password = muserModel.convertToMD5(mpassword.getCurrentPassword());
-            if (password == null || muser.getPassword().compareTo(password) != 0) {
+            String passwordMD5 = JsfUtil.convertToMD5(mpassword.getCurrentPassword());
+            System.out.println(passwordMD5 + "\n" + muser.getPassword());
+            if (passwordMD5 == null || muser.getPassword().compareTo(passwordMD5) != 0) {
                 JsfUtil.addErrorMessage("Mật khẩu cũ không đúng");
             }
 
-        } catch (IOException | ClassNotFoundException | SQLException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -108,7 +113,9 @@ public class UserController implements Serializable {
     public void checkNewPassword(AjaxBehaviorEvent event) {
 
         if (mpassword.getNewPassword().compareTo(mpassword.getRepeatNewPassword()) != 0) {
-            JsfUtil.addErrorMessage("Mật khẩu mới không tr");
+            JsfUtil.addErrorMessage("Mật khẩu mới không trùng với mật khẩu nhập lại");
+        } else {
+            inputChangePasswordCorrect = true;
         }
 
     }
@@ -116,11 +123,73 @@ public class UserController implements Serializable {
     public void saveChangePassword(ActionEvent event) {
         try {
             if (muserModel.changePassword(mpassword.getNewPassword(), muser.getId()) > 0) {
-                JsfUtil.addSuccessMessage("success");
+                JsfUtil.addSuccessMessage("Change password successfully");
+                inputChangePasswordCorrect = false;
             }
         } catch (IOException | ClassNotFoundException | SQLException ex) {
             JsfUtil.addErrorMessage("error: \n" + ex);
             Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Create account
+     *
+     * @param event
+     */
+    public void checkUser(AjaxBehaviorEvent event) {
+        int i = 0;
+        for (User user : musers) {
+            if (mcreateUser.getUsername().equalsIgnoreCase(user.getUsername())) {
+                JsfUtil.addErrorMessage("Username have already");
+                mcreateUser.setUsername(null);
+                break;
+            } else {
+                i++;
+            }
+        }
+        if (i == musers.size()) {
+            JsfUtil.addSuccessMessage("Username can be used");
+        }
+    }
+
+    public void checkEmail(AjaxBehaviorEvent event) {
+        int i = 0;
+        for (User user : musers) {
+            if (mcreateUser.getEmail().equalsIgnoreCase(user.getEmail())) {
+                JsfUtil.addErrorMessage("Email have already");
+                mcreateUser.setEmail(null);
+                break;
+            } else {
+                i++;
+            }
+        }
+        if (i == musers.size()) {
+            JsfUtil.addSuccessMessage("Email can be used");
+        }
+    }
+
+    public void createAccount(ActionEvent event) {
+        try {
+            String password = JsfUtil.randomPassword();
+            String toEmail = mcreateUser.getEmail();
+            String subject = "CONFIRM ACCOUNT FROM SYSTEM VNSOFTWARE";
+            String body = "Hi "+ toEmail +". \n"
+                    + " \n username: " + mcreateUser.getUsername() +" \n "
+                    + " \n password: " + password + ""
+                    + "\n \n \n"
+                    + "PLEASE. CHANGE PASSWORD ON FIRST LOGIN \n \n \n"
+                    + "admin: thiendv" ;
+            mcreateUser.setPassword(password);
+            MailServer.sendMessages(toEmail, subject, body);
+            if( muserModel.addUser(mcreateUser) > 0 ) {
+                JsfUtil.addSuccessMessage("Create account successfully.");
+            }
+        } catch (IOException | ClassNotFoundException | SQLException | NoSuchAlgorithmException ex) {
+            System.out.println(ex.toString());
+            JsfUtil.addErrorMessage("Error \n " + ex.toString());
+            Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.toString());
         }
     }
 
@@ -147,6 +216,22 @@ public class UserController implements Serializable {
 
     public void setMpassword(Password mpassword) {
         this.mpassword = mpassword;
+    }
+
+    public boolean isInputChangePasswordCorrect() {
+        return inputChangePasswordCorrect;
+    }
+
+    public void setInputChangePasswordCorrect(boolean inputChangePasswordCorrect) {
+        this.inputChangePasswordCorrect = inputChangePasswordCorrect;
+    }
+
+    public User getMcreateUser() {
+        return mcreateUser;
+    }
+
+    public void setMcreateUser(User mcreateUser) {
+        this.mcreateUser = mcreateUser;
     }
 
 }
