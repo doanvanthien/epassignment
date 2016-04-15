@@ -28,7 +28,7 @@ public class tempClass {
      */
     public static void main(String[] args) {
 
-        File file = new File("C:\\Users\\doanvanthien\\Desktop\\mine.jpg");
+        File file = new File("E:\\Photograph\\Temporary\\mshien.jpg");
 
         try {
             // Reading a Image file from file system
@@ -37,15 +37,15 @@ public class tempClass {
             imageInFile.read(imageData);
 
             // Converting Image byte array into Base64 String
+            System.out.println(encodeImage(imageData));
             String imageDataString = encodeImage(imageData);
-            System.out.println(imageDataString);
 
             // Converting a Base64 String into Image byte array
             byte[] imageByteArray = decodeImage(imageDataString);
 
             // Write a image byte array into file system
             FileOutputStream imageOutFile = new FileOutputStream(
-                    "C:\\Users\\doanvanthien\\Desktop\\mine-convert.jpg");
+                    "C:\\Users\\doanvanthien\\Desktop\\LOGO.png");
 
             imageOutFile.write(imageByteArray);
 

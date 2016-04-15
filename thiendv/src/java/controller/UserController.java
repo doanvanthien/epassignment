@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.servlet.http.HttpSession;
 import org.primefaces.context.RequestContext;
@@ -62,34 +63,32 @@ public class UserController implements Serializable {
         }
     }
 
-    public void login(ActionEvent event) {
+    public String login(ActionEvent event) {
         try {
-            RequestContext context = RequestContext.getCurrentInstance();
-            boolean loggedIn = false;
 
             if (muserModel.validate(muser.getUsername(), muser.getPassword())) {
-                loggedIn = true;
                 JsfUtil.setSessionValue("user", muser);
                 muser = muserModel.getUser(muser.getUsername());
                 isLogin = true;
+
             } else {
-                loggedIn = false;
                 muser = new User();
                 isLogin = false;
                 JsfUtil.addErrorMessage("Please enter correct username and password");
             }
-            context.addCallbackParam("loggedIn", loggedIn);
+
         } catch (IOException | ClassNotFoundException | SQLException ex) {
             Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        return "login";
     }
 
-    public void logout(ActionEvent event) {
+    public String logout(ActionEvent event) {
         JsfUtil.setSessionValue("user", null);
         JsfUtil.removeSession("user");
         isLogin = false;
-        //JsfUtil.navigate("logout");
+        //JsfUtil.navigate("logout"); //
+        return "logout";
     }
 
     /**
@@ -174,15 +173,15 @@ public class UserController implements Serializable {
             String password = JsfUtil.randomPassword();
             String toEmail = mcreateUser.getEmail();
             String subject = "CONFIRM ACCOUNT FROM SYSTEM VNSOFTWARE";
-            String body = "Hi "+ toEmail +". \n"
-                    + " \n username: " + mcreateUser.getUsername() +" \n "
+            String body = "Hi " + toEmail + ". \n"
+                    + " \n username: " + mcreateUser.getUsername() + " \n "
                     + " \n password: " + password + ""
                     + "\n \n \n"
                     + "PLEASE. CHANGE PASSWORD ON FIRST LOGIN \n \n \n"
-                    + "admin: thiendv" ;
+                    + "admin: thiendv";
             mcreateUser.setPassword(password);
             MailServer.sendMessages(toEmail, subject, body);
-            if( muserModel.addUser(mcreateUser) > 0 ) {
+            if (muserModel.addUser(mcreateUser) > 0) {
                 JsfUtil.addSuccessMessage("Create account successfully.");
             }
         } catch (IOException | ClassNotFoundException | SQLException | NoSuchAlgorithmException ex) {

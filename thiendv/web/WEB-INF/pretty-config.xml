@@ -14,5 +14,5 @@ and open the template in the editor.
         <pattern value="/" />
         <view-id value="/faces/index.xhtml" />
     </url-mapping>
-    
+
 </pretty-config>

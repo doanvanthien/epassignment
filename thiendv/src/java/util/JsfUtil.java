@@ -5,10 +5,16 @@
  */
 package util;
 
+import static controller.tempClass.encodeImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import javax.faces.application.FacesMessage;
 import javax.faces.application.NavigationHandler;
 import javax.faces.context.FacesContext;
@@ -121,5 +127,36 @@ public class JsfUtil {
         }
 
         return result;
+    }
+
+    public static String getImageByBase64(String path) throws IOException {
+        String result = null;
+        File file = new File(path);
+
+        // Reading a Image file from file system
+        FileInputStream imageInFile = new FileInputStream(file);
+        byte imageData[] = new byte[(int) file.length()];
+        imageInFile.read(imageData);
+
+        // Converting Image byte array into Base64 String
+        System.out.println(encodeImage(imageData));
+        result = encodeImage(imageData);
+        imageInFile.close();
+
+        return result;
+    }
+
+    public static String getImageByBase64(byte[] imageDate) {
+        String result = null;
+        result = encodeImage(imageDate);
+
+        return result;
+    }
+
+    public static boolean isNumeric(String str) {
+        NumberFormat formatter = NumberFormat.getInstance();
+        ParsePosition pos = new ParsePosition(0);
+        formatter.parse(str, pos);
+        return str.length() == pos.getIndex();
     }
 }

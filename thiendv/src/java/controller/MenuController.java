@@ -57,7 +57,7 @@ public class MenuController implements Serializable {
 
     public void changeNavigation(MenuActionEvent event) {
         this.navigation = event.getMenuItem().getParams().get("url").get(0);
-        FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("form_main_center");
+        FacesContext.getCurrentInstance().getPartialViewContext().getRenderIds().add("panel_main_form");
     }
 
     /**

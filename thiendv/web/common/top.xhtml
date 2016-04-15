@@ -52,7 +52,7 @@
                         <p:row>
                             <p:column colspan="2" style="text-align: center;">
                                 <p:commandButton value="Login" 
-                                                 actionListener="#{userController.login(event)}" process="@this, :form_main_top:panelGrid_login" update=" :form_main_center :form_main_top:messages-error form_main_top" />                
+                                                 action="#{userController.login(event)}" process="@this, :form_main_top:panelGrid_login" update=" :panel_main_form :form_main_top:messages-error form_main_top" />                
                                 <p:commandButton value="Cancel" process="@this" update=":form_main_top:panelGrid_login" onclick="PF('login').hide();" />
                             </p:column>
                         </p:row>
@@ -135,7 +135,7 @@
                     </p:panelGrid>
                 </p:dialog>
                 <p:confirmDialog widgetVar="logout" header="Do you want to logout?" >
-                    <p:commandButton value="Yes" icon="ui-icon-check" actionListener="#{userController.logout(event)}" process="@this" update="form_main_top :form_main_center" />
+                    <p:commandButton value="Yes" icon="ui-icon-check" action="#{userController.logout(event)}" process="@this" update="form_main_top :panel_main_form" />
                     <p:commandButton value="No" icon="ui-icon-close" onclick="PF('logout').hide();" />
                 </p:confirmDialog>
             </h:form>

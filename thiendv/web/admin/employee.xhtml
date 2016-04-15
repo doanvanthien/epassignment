@@ -3,23 +3,182 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-              >
-    <!-- 10:12:52AM -->
-    <h:body>
-        <ui:composition> 
-            <style type="text/css">
-                .ui-datatable tr.ui-datatable-even:hover, .ui-datatable tr.ui-datatable-odd:hover {
-                    background: #F3E2A9;
-                }
-                .ui-widget-header .ui-inputfield, .ui-widget-content .ui-inputfield{
-                    width: 100%;
-                }
 
-            </style>
-            <h:form id="form_main">
-                employee
-                
-            </h:form>
-        </ui:composition>
-    </h:body>   
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <!-- 10:12:52AM -->
+    <f:view>
+        <h:body>
+            <ui:composition> 
+                <style type="text/css">
+                    .ui-datatable tr.ui-datatable-even:hover, .ui-datatable tr.ui-datatable-odd:hover {
+                        background: #F3E2A9;
+                    }
+                    .ui-widget-header .ui-inputfield, .ui-widget-content .ui-inputfield{
+                        width: 100%;
+                    }
+
+                </style>
+                <h:form id="form_main_employee"  >
+                    <p:growl id="messages" />
+                    <p:panel id="panel_command" visible="#{employeeController.isLogged }" >
+                        <p:commandButton disabled="#{(employeeController.mlistEmployeeSelected.size() > 0 ? true : false)}" rendered="#{ employeeController.status == 'SELECT'}" icon="ui-icon-plus" value="Add Employee" process="@this" actionListener="#{employeeController.addEmployee(event)}" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee :form_main_employee:panel_add_employee" /> <!-- update=":form_main_employee_center:form_main_employee:panel_command :form_main_employee_center:form_main_employee:panel_list_employee :form_main_employee_center:form_main_employee:panel_add_employee" /> -->
+                        <p:commandButton icon="ui-icon-trash" rendered="#{ employeeController.status == 'SELECT'}" disabled="#{!(employeeController.mlistEmployeeSelected.size() > 0 ? true : false)}" value="Delete All" process="@this" onclick="PF('dialog_delete_all').show();" actionListener="#{employeeController.preDeleteAll}"  />
+                    </p:panel>
+                    <p:panel id="panel_list_employee" visible="#{employeeController.status == 'SELECT'}">
+                        <p:dataTable value="#{employeeController.mlistEmployee}" var="employee" rowKey="#{employee.id}" paginator="true" paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,30" selection="#{employeeController.mlistEmployeeSelected}"  >
+                            <f:facet name="header">
+                                List Employee
+                            </f:facet>
+                            <p:ajax event="rowSelectCheckbox" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee"  />
+                            <p:ajax event="rowUnselectCheckbox" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee"/>
+                            <!--                            <p:ajax event="toggleSelect" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee" />-->
+
+                            <p:column selectionMode="multiple" style="width:5%;text-align:center;" />
+                            <p:column headerText="Name" style="width: 330px;" filterBy="#{employee.name}" sortBy="#{employee.name}" filterMatchMode="contains" >
+                                <h:outputText value="#{employee.name}" />
+                            </p:column>
+                            <p:column headerText="Job Title" style="width: 330px;" >
+                                <h:outputText value="#{employee.jobTitle}" />
+                            </p:column>
+                            <p:column headerText="Department" style="width: 330px;"   >
+                                <h:outputText value="#{employee.departmentId}" rendered="#{!(employee.departmentId == 0)}" >
+                                    <f:selectItems value="#{employeeController.mlistDepartment}" var="department" itemLabel="#{department.name}" itemValue="#{department.id}" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Email" style="width: 330px;" >
+                                <h:outputText value="#{employee.email}" />
+                            </p:column>
+                            <p:column id="control_list_employee" style="text-align: center;width: 330px;" >
+                                <p:commandButton value="Edit" icon="ui-icon-pencil" style="background: #64ffda; width: 90px; color: black;" process="@this" actionListener="#{employeeController.preEdit(employee)}" rendered="#{employeeController.isLogged}" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee :form_main_employee:panel_add_employee :form_main_employee:messages" disabled="#{(employeeController.mlistEmployeeSelected.size() > 0 ? true : false)}" />
+                                <p:commandButton value="Delete" icon="ui-icon-trash" style="background: #ef9a9a; width: 90px; color: black;" onclick="PF('dialog_delete').show();" process="@this" actionListener="#{employeeController.preDelte(employee)}"  rendered="#{employeeController.isLogged}" disabled="#{(employeeController.mlistEmployeeSelected.size() > 0 ? true : false)}" />
+                                <p:commandButton icon="ui-icon-search" update=":form_main_employee:dialog_detail_employee" title="Detail info employee" oncomplete="PF('detail_employee').show();" process="@this" actionListener="#{employeeController.detailEmployee(employee)}" disabled="#{(employeeController.mlistEmployeeSelected.size() > 0 ? true : false)}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                    <p:panel id="panel_add_employee" visible="#{employeeController.status == 'CREATE'|| employeeController.status == 'UPDATE'}" style="margin-left: auto; margin-right: auto; width: 50%;" >
+                        <p:panelGrid style="width: 100%;" >
+                            <p:row>
+                                <p:column >
+                                    <h:outputText value="Avatar" />
+                                </p:column>
+                                <p:column >                                    
+                                    Sorry. We don't function upload avatar now.
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column >
+                                    <h:outputText value="Name *" />
+                                </p:column>
+                                <p:column >
+                                    <p:inputText required="true" value="#{employeeController.memployee.name}" requiredMessage="Name not empty" />
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column >
+                                    <h:outputText value="Cell phone *" />
+                                </p:column>
+                                <p:column >
+                                    <p:inputText required="true" value="#{employeeController.memployee.cellPhone}" requiredMessage="Cell phone have value from 8 to 15 number" >
+                                        <f:validateLength  minimum="8" maximum="15"  />
+                                        <f:validateRegex pattern="[0-9]*"  />
+                                    </p:inputText>
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column >
+                                    <h:outputText value="Job title" />
+                                </p:column>
+                                <p:column >
+                                    <p:inputText value="#{employeeController.memployee.jobTitle}" />
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column >
+                                    <h:outputText value="Email *" />
+                                </p:column>
+                                <p:column >
+                                    <p:inputText required="true" value="#{employeeController.memployee.email}" requiredMessage="Invalid email format" >
+                                        <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                    </p:inputText>
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column >
+                                    <h:outputText value="Department" />
+                                </p:column>
+                                <p:column >
+                                    <p:selectOneMenu value="#{employeeController.memployee.departmentId}" >
+                                        <f:selectItem itemLabel="--Select department--" />
+                                        <f:selectItems value="#{employeeController.mlistDepartment}" var="department" itemLabel="#{department.name}" itemValue="#{department.id}"  />
+                                    </p:selectOneMenu>
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column colspan="2" style="text-align: center;" >
+                                    <p:commandButton icon="ui-icon-arrow-1-w" value="Back" process="@this" actionListener="#{employeeController.backEmployee(event)}" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee :form_main_employee:panel_add_employee"  />
+                                    <p:commandButton icon="ui-icon-disk" value="Save" process="@this :form_main_employee:panel_add_employee" actionListener="#{employeeController.save(event)}" style="text-align: center;" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee :form_main_employee:panel_add_employee :form_main_employee:messages"/>
+                                </p:column>
+                            </p:row>
+                        </p:panelGrid>
+                    </p:panel>
+                    <p:confirmDialog widgetVar="dialog_delete"  severity="alert" header="Do you want delete employee?">
+                        <p:commandButton value="Yes" icon="ui-icon-check" action="#{employeeController.deleteEmployee(event)}" oncomplete="PF('dialog_delete').hide();" process="@this" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee :form_main_employee:panel_add_employee :form_main_employee:messages" />
+                        <p:commandButton value="No" icon="ui-icon-close" onclick="PF('dialog_delete').hide();" />
+                    </p:confirmDialog>
+
+                    <p:confirmDialog widgetVar="dialog_delete_all"  severity="alert" header="Do you want delete all selected employee?">
+                        <p:commandButton value="Yes" icon="ui-icon-check" action="#{employeeController.deleteAllEmployee(event)}" oncomplete="PF('dialog_delete_all').hide();" process="@this" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee :form_main_employee:panel_add_employee :form_main_employee:messages" />
+                        <p:commandButton value="No" icon="ui-icon-close" process="@this" actionListener="#{employeeController.removeDeleteAll(event)}" onclick="PF('dialog_delete_all').hide();" />
+                    </p:confirmDialog> 
+                    <p:dialog id="dialog_detail_employee" widgetVar="detail_employee"  >
+                        <p:panelGrid style="width: 100%;" >
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="Name" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{employeeController.memployee.name}" />
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="Email" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{employeeController.memployee.email}" />
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="Job title" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{employeeController.memployee.jobTitle}" />
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="Department" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{employeeController.memployee.departmentId}" rendered="#{!(employeeController.memployee.departmentId == 0)}" >
+                                        <f:selectItems value="#{employeeController.mlistDepartment}" var="department_detail" itemLabel="#{department_detail.name}" itemValue="#{department_detail.id}" />
+                                    </h:outputText>
+                                </p:column>
+                            </p:row>
+                            <p:row>
+                                <p:column>
+                                    <h:outputText value="Cell phone" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{employeeController.memployee.cellPhone}" />
+                                </p:column>
+                            </p:row>
+                        </p:panelGrid>
+                    </p:dialog>
+                </h:form>
+            </ui:composition>
+        </h:body>   
+    </f:view>
 </html>
