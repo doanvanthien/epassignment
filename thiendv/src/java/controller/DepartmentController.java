@@ -41,6 +41,7 @@ public class DepartmentController implements Serializable {
     private List<Employee> mlistEmployee;
     private List<Employee> mlistEmployeeNotBelongDepartment;
     private List<Employee> mlistEmployeeBelongDepartment;
+    private Departments mdepartments;
     private List<Departments> mlistDepartments;
 
     public static enum PersistenceAction {
@@ -113,6 +114,7 @@ public class DepartmentController implements Serializable {
                     status = PersistenceAction.SELECT;
                     mdepartment = new Department();
                     mlistDepartment = mdepartmentModel.getAll();
+                    mlistDepartments = new ArrayList<>();
                     setDepartments(mlistEmployee, mlistDepartment, mlistDepartments);
                     JsfUtil.addSuccessMessage("Add department successfully");
                 } else {
@@ -125,6 +127,7 @@ public class DepartmentController implements Serializable {
                     status = PersistenceAction.SELECT;
                     mdepartment = new Department();
                     mlistDepartment = mdepartmentModel.getAll();
+                    mlistDepartments = new ArrayList<>();
                     setDepartments(mlistEmployee, mlistDepartment, mlistDepartments);
                     JsfUtil.addSuccessMessage("Update info department successfully");
                 } else {
@@ -162,6 +165,7 @@ public class DepartmentController implements Serializable {
                     mdepartment = new Department();
                     mlistDepartment = mdepartmentModel.getAll();
                     JsfUtil.addSuccessMessage("Delete partment successfully");
+                    mlistDepartments = new ArrayList<>();
                     setDepartments(mlistEmployee, mlistDepartment, mlistDepartments);
                 } else {
                     JsfUtil.addErrorMessage("Error occurred when delete department");
@@ -173,7 +177,14 @@ public class DepartmentController implements Serializable {
     }
 
     public void detailDepartment(Department department) {
-        mdepartment = department;
+        mdepartments = new Departments();
+        mdepartments.setMdepartment(department);
+        for (Departments ds : mlistDepartments) {
+            if (ds.getMdepartment().getId() == department.getId()) {
+                mdepartments = ds;
+                break;
+            }
+        }
 
     }
 
@@ -241,6 +252,14 @@ public class DepartmentController implements Serializable {
 
     public void setMlistDepartments(List<Departments> mlistDepartments) {
         this.mlistDepartments = mlistDepartments;
+    }
+
+    public Departments getMdepartments() {
+        return mdepartments;
+    }
+
+    public void setMdepartments(Departments mdepartments) {
+        this.mdepartments = mdepartments;
     }
 
 }

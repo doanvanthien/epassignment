@@ -55,8 +55,9 @@ public class EmployeeController implements Serializable {
     private List<Department> mlistDepartment;
     private DepartmentModel mdepartmentModel;
     private UploadedFile file;
-    private List<Employee> mlistEmployeeSelected;
+    private List<Employees> mlistEmployeesSelected;
     private Employees memployees;
+    private List<Employees> mlistEmployees;
 
     // controller
     public EmployeeController() {
@@ -68,11 +69,34 @@ public class EmployeeController implements Serializable {
             status = PersistenceAction.SELECT;
             mdepartmentModel = new DepartmentModel();
             mlistDepartment = mdepartmentModel.getAll();
-            mlistEmployeeSelected = new ArrayList<>();
+            mlistEmployeesSelected = new ArrayList<>();
             memployees = new Employees();
+            mlistEmployees = new ArrayList<>();
+            setEmployees(mlistDepartment, mlistEmployee, mlistEmployees);
+            System.out.println("ahihi");
 
         } catch (IOException | ClassNotFoundException | SQLException ex) {
             Logger.getLogger(EmployeeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void setEmployees(List<Department> departments, List<Employee> employees, List<Employees> employeess) {
+        for (Employee e : employees) {
+            if (e.getDepartmentId() != 0) {
+                for (Department d : departments) {
+                    if (d.getEmployeeId() == e.getId()) {
+                        Employees es = new Employees();
+                        es.setEmployee(e);
+                        es.setNameDepartment(d.getName());
+                        employeess.add(es);
+                    }
+                }
+            } else {
+                Employees es = new Employees();
+                es.setEmployee(e);
+                es.setNameDepartment(" ");
+                employeess.add(es);
+            }
         }
     }
 
@@ -91,7 +115,7 @@ public class EmployeeController implements Serializable {
     }
 
     public void preEdit(Employee employee) {
-        this.memployee = employee;
+        memployee = employee;
         status = PersistenceAction.UPDATE;
     }
 
@@ -117,6 +141,8 @@ public class EmployeeController implements Serializable {
                     file = new DefaultUploadedFile();
                     status = PersistenceAction.SELECT;
                     memployee = new Employee();
+                    mlistEmployees = new ArrayList<>();
+                    setEmployees(mlistDepartment, mlistEmployee, mlistEmployees);
                 } else {
                     JsfUtil.addErrorMessage("Occurred when delete employee");
                 }
@@ -138,11 +164,13 @@ public class EmployeeController implements Serializable {
     public void deleteAllEmployee(ActionEvent event) {
         if (status == PersistenceAction.DELETE) {
             try {
-                if (memEmployeeModel.delelteAllEmployee(mlistEmployeeSelected) > 0) {
+                if (memEmployeeModel.delelteAllEmployee(mlistEmployeesSelected) > 0) {
                     JsfUtil.addSuccessMessage("Delete all select employee successfully");
                     status = PersistenceAction.SELECT;
-                    mlistEmployeeSelected = new ArrayList<>();
+                    mlistEmployeesSelected = new ArrayList<>();
                     mlistEmployee = memEmployeeModel.getAll();
+                    mlistEmployees = new ArrayList<>();
+                    setEmployees(mlistDepartment, mlistEmployee, mlistEmployees);
                 }
             } catch (IOException ex) {
                 Logger.getLogger(EmployeeController.class.getName()).log(Level.SEVERE, null, ex);
@@ -165,6 +193,8 @@ public class EmployeeController implements Serializable {
                     file = new DefaultUploadedFile();
                     status = PersistenceAction.SELECT;
                     memployee = new Employee();
+                    mlistEmployees = new ArrayList<>();
+                    setEmployees(mlistDepartment, mlistEmployee, mlistEmployees);
                 } else {
                     JsfUtil.addErrorMessage("Occurred when create employee");
 
@@ -178,6 +208,8 @@ public class EmployeeController implements Serializable {
                     memployee = new Employee();
                     JsfUtil.addSuccessMessage("Update info employee successfully");
                     mlistEmployee = memEmployeeModel.getAll();
+                    mlistEmployees = new ArrayList<>();
+                    setEmployees(mlistDepartment, mlistEmployee, mlistEmployees);
                 } else {
                     JsfUtil.addErrorMessage("Occurred when update info employee");
                 }
@@ -276,12 +308,12 @@ public class EmployeeController implements Serializable {
         this.mlistDepartment = mlistDepartment;
     }
 
-    public List<Employee> getMlistEmployeeSelected() {
-        return mlistEmployeeSelected;
+    public List<Employees> getMlistEmployeesSelected() {
+        return mlistEmployeesSelected;
     }
 
-    public void setMlistEmployeeSelected(List<Employee> mlistEmployeeSelected) {
-        this.mlistEmployeeSelected = mlistEmployeeSelected;
+    public void setMlistEmployeesSelected(List<Employees> mlistEmployeesSelected) {
+        this.mlistEmployeesSelected = mlistEmployeesSelected;
     }
 
     public Employees getMemployees() {
@@ -290,6 +322,14 @@ public class EmployeeController implements Serializable {
 
     public void setMemployees(Employees memployees) {
         this.memployees = memployees;
+    }
+
+    public List<Employees> getMlistEmployees() {
+        return mlistEmployees;
+    }
+
+    public void setMlistEmployees(List<Employees> mlistEmployees) {
+        this.mlistEmployees = mlistEmployees;
     }
 
 }

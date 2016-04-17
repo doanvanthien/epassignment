@@ -22,11 +22,11 @@
                 <h:form id="form_main_employee"  >
                     <p:growl id="messages" />
                     <p:panel id="panel_command" visible="#{employeeController.isLogged }" >
-                        <p:commandButton disabled="#{(employeeController.mlistEmployeeSelected.size() > 0 ? true : false)}" rendered="#{ employeeController.status == 'SELECT'}" icon="ui-icon-plus" value="Add Employee" process="@this" actionListener="#{employeeController.addEmployee(event)}" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee :form_main_employee:panel_form_employee" /> <!-- update=":form_main_employee_center:form_main_employee:panel_command :form_main_employee_center:form_main_employee:panel_list_employee :form_main_employee_center:form_main_employee:panel_form_employee" /> -->
-                        <p:commandButton icon="ui-icon-trash" rendered="#{ employeeController.status == 'SELECT'}" disabled="#{!(employeeController.mlistEmployeeSelected.size() > 0 ? true : false)}" value="Delete All" process="@this" onclick="PF('dialog_delete_all').show();" actionListener="#{employeeController.preDeleteAll}"  />
+                        <p:commandButton disabled="#{(employeeController.mlistEmployeesSelected.size() > 0 ? true : false)}" rendered="#{ employeeController.status == 'SELECT'}" icon="ui-icon-plus" value="Add Employee" process="@this" actionListener="#{employeeController.addEmployee(event)}" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee :form_main_employee:panel_form_employee" /> <!-- update=":form_main_employee_center:form_main_employee:panel_command :form_main_employee_center:form_main_employee:panel_list_employee :form_main_employee_center:form_main_employee:panel_form_employee" /> -->
+                        <p:commandButton icon="ui-icon-trash" rendered="#{ employeeController.status == 'SELECT'}" disabled="#{!(employeeController.mlistEmployeesSelected.size() > 0 ? true : false)}" value="Delete All" process="@this" onclick="PF('dialog_delete_all').show();" actionListener="#{employeeController.preDeleteAll}"  />
                     </p:panel>
                     <p:panel id="panel_list_employee" visible="#{employeeController.status == 'SELECT'}">
-                        <p:dataTable value="#{employeeController.mlistEmployee}" var="employee" rowKey="#{employee.id}" paginator="true" paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,30" selection="#{employeeController.mlistEmployeeSelected}"  >
+                        <p:dataTable value="#{employeeController.mlistEmployees}" var="employees" rowKey="#{employees.employee.id}" paginator="true" paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,30" selection="#{employeeController.mlistEmployeesSelected}"  >
                             <f:facet name="header">
                                 List Employee
                             </f:facet>
@@ -35,25 +35,24 @@
                             <!--                            <p:ajax event="toggleSelect" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee" />-->
 
                             <p:column selectionMode="multiple" style="width:5%;text-align:center;" />
-                            <p:column headerText="Employee Code" style="width: 330px;" filterBy="#{employee.employeeCode}" sortBy="#{employee.employeeCode}" filterMatchMode="contains" >
-                                <h:outputText value="#{employee.employeeCode}" />
+                            <p:column headerText="Employee Code" style="width: 330px;" filterBy="#{employees.employee.employeeCode}" sortBy="#{employees.employee.employeeCode}" filterMatchMode="contains" >
+                                <h:outputText value="#{employees.employee.employeeCode}" />
                             </p:column>
                             
-                            <p:column headerText="Name" style="width: 330px;" filterBy="#{employee.name}" sortBy="#{employee.name}" filterMatchMode="contains" >
-                                <h:outputText value="#{employee.name}" />
+                            <p:column headerText="Name" style="width: 330px;" filterBy="#{employees.employee.name}" sortBy="#{employees.employee.name}" filterMatchMode="contains" >
+                                <h:outputText value="#{employees.employee.name}" />
                             </p:column>
                             <p:column headerText="Job Title" style="width: 330px;" >
-                                <h:outputText value="#{employee.jobTitle}" />
+                                <h:outputText value="#{employees.employee.jobTitle}" />
                             </p:column>
                             <p:column headerText="Department" style="width: 330px;"   >
-                                <h:outputText value="#{employee.departmentId}" rendered="#{!(employee.departmentId == 0) and (employee.departmentId == department.id)}" >
-                                    <f:selectItems value="#{employeeController.mlistDepartment}" var="department" itemLabel="#{department.name}" itemValue="#{department.id}" />
+                                <h:outputText value="#{employees.nameDepartment}" >  
                                 </h:outputText>
                             </p:column>
                             <p:column id="control_list_employee" style="text-align: center;width: 330px;" >
-                                <p:commandButton value="Edit" icon="ui-icon-pencil" style="background: #64ffda; width: 90px; color: black;" process="@this" actionListener="#{employeeController.preEdit(employee)}" rendered="#{employeeController.isLogged}" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee :form_main_employee:panel_form_employee :form_main_employee:messages" disabled="#{(employeeController.mlistEmployeeSelected.size() > 0 ? true : false)}" />
-                                <p:commandButton value="Delete" icon="ui-icon-trash" style="background: #ef9a9a; width: 90px; color: black;" onclick="PF('dialog_delete').show();" process="@this" actionListener="#{employeeController.preDelte(employee)}"  rendered="#{employeeController.isLogged}" disabled="#{(employeeController.mlistEmployeeSelected.size() > 0 ? true : false)}" />
-                                <p:commandButton icon="ui-icon-search" update=":form_main_employee:dialog_detail_employee" title="Detail info employee" oncomplete="PF('detail_employee').show();" process="@this" actionListener="#{employeeController.detailEmployee(employee)}" disabled="#{(employeeController.mlistEmployeeSelected.size() > 0 ? true : false)}" />
+                                <p:commandButton value="Edit" icon="ui-icon-pencil" style="background: #64ffda; width: 90px; color: black;" process="@this" actionListener="#{employeeController.preEdit(employees.employee)}" rendered="#{employeeController.isLogged}" update=":form_main_employee:panel_command :form_main_employee:panel_list_employee :form_main_employee:panel_form_employee :form_main_employee:messages" disabled="#{(employeeController.mlistEmployeesSelected.size() > 0 ? true : false)}" />
+                                <p:commandButton value="Delete" icon="ui-icon-trash" style="background: #ef9a9a; width: 90px; color: black;" onclick="PF('dialog_delete').show();" process="@this" actionListener="#{employeeController.preDelte(employees.employee)}"  rendered="#{employeeController.isLogged}" disabled="#{(employeeController.mlistEmployeesSelected.size() > 0 ? true : false)}" />
+                                <p:commandButton icon="ui-icon-search" update=":form_main_employee:dialog_detail_employee" title="Detail info employee" oncomplete="PF('detail_employee').show();" process="@this" actionListener="#{employeeController.detailEmployee(employees.employee)}" disabled="#{(employeeController.mlistEmployeesSelected.size() > 0 ? true : false)}" />
                             </p:column>
                         </p:dataTable>
                     </p:panel>
@@ -64,7 +63,7 @@
                                     <h:outputText value="Avatar" />
                                 </p:column>
                                 <p:column >                                    
-                                    Sorry. We don't function upload avatar now.
+                                    Sorry. We don't complete function upload avatar now.
                                 </p:column>
                             </p:row>
                             <p:row>

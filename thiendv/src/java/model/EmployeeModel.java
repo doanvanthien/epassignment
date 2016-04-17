@@ -6,6 +6,7 @@
 package model;
 
 import entity.Employee;
+import entity.Employees;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -114,11 +115,11 @@ public class EmployeeModel extends ConnectionPool implements Serializable {
         return result;
     }
 
-    public int delelteAllEmployee(List<Employee> listEmployee) throws IOException, ClassNotFoundException, SQLException {
+    public int delelteAllEmployee(List<Employees> listEmployees) throws IOException, ClassNotFoundException, SQLException {
         int result = -1;
         openConnection();
-        for (Employee employee : listEmployee) {
-            String strSql = "delete employee where id = " + employee.getId();
+        for (Employees employees : listEmployees) {
+            String strSql = "delete employee where id = " + employees.getEmployee().getId();
             mpreparedStatement = connection.prepareStatement(strSql);
             result = mpreparedStatement.executeUpdate();
         }
