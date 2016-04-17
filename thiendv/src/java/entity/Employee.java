@@ -14,6 +14,7 @@ import java.io.Serializable;
 public class Employee implements Serializable {
 
     private int id;
+    private String employeeCode;
     private String name;
     private String photo;
     private String jobTitle;
@@ -75,6 +76,14 @@ public class Employee implements Serializable {
 
     public void setDepartmentId(int departmentId) {
         this.departmentId = departmentId;
+    }
+
+    public String getEmployeeCode() {
+        return employeeCode;
+    }
+
+    public void setEmployeeCode(String employeeCode) {
+        this.employeeCode = employeeCode;
     }
 
 }

@@ -14,6 +14,7 @@ import java.io.Serializable;
 public class Department implements Serializable {
 
     private int id;
+    private String departmentCode;
     private String name;
     private String officePhone;
     private int employeeId;
@@ -48,6 +49,14 @@ public class Department implements Serializable {
 
     public void setEmployeeId(int employeeId) {
         this.employeeId = employeeId;
+    }
+
+    public String getDepartmentCode() {
+        return departmentCode;
+    }
+
+    public void setDepartmentCode(String departmentCode) {
+        this.departmentCode = departmentCode;
     }
 
 }

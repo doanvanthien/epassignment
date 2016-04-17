@@ -7,8 +7,8 @@ package controller;
 
 import entity.Department;
 import entity.Employee;
+import entity.Employees;
 import entity.User;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -56,7 +56,7 @@ public class EmployeeController implements Serializable {
     private DepartmentModel mdepartmentModel;
     private UploadedFile file;
     private List<Employee> mlistEmployeeSelected;
-    
+    private Employees memployees;
 
     // controller
     public EmployeeController() {
@@ -69,6 +69,7 @@ public class EmployeeController implements Serializable {
             mdepartmentModel = new DepartmentModel();
             mlistDepartment = mdepartmentModel.getAll();
             mlistEmployeeSelected = new ArrayList<>();
+            memployees = new Employees();
 
         } catch (IOException | ClassNotFoundException | SQLException ex) {
             Logger.getLogger(EmployeeController.class.getName()).log(Level.SEVERE, null, ex);
@@ -133,7 +134,7 @@ public class EmployeeController implements Serializable {
     public void removeDeleteAll(ActionEvent event) {
         status = PersistenceAction.SELECT;
     }
-    
+
     public void deleteAllEmployee(ActionEvent event) {
         if (status == PersistenceAction.DELETE) {
             try {
@@ -189,7 +190,14 @@ public class EmployeeController implements Serializable {
     }
 
     public void detailEmployee(Employee employee) {
-        this.memployee = employee;
+        memployees = new Employees();
+        memployees.setEmployee(employee);
+        for (Department department : mlistDepartment) {
+            if (department.getId() == employee.getDepartmentId()) {
+                memployees.setNameDepartment(department.getName());
+                break;
+            }
+        }
         System.out.println("detail");
     }
 
@@ -213,15 +221,8 @@ public class EmployeeController implements Serializable {
     }
 
     public void checkPhoneNumber(AjaxBehaviorEvent event) {
-        if( ! JsfUtil.isNumeric(memployee.getCellPhone()) ) {
+        if (!JsfUtil.isNumeric(memployee.getCellPhone())) {
             JsfUtil.addErrorMessage("Num");
-        }
-    }
-    
-    private void createFolder(String path) {
-        File f = new File(path);
-        if (!f.exists()) {
-            f.mkdirs();
         }
     }
 
@@ -281,6 +282,14 @@ public class EmployeeController implements Serializable {
 
     public void setMlistEmployeeSelected(List<Employee> mlistEmployeeSelected) {
         this.mlistEmployeeSelected = mlistEmployeeSelected;
+    }
+
+    public Employees getMemployees() {
+        return memployees;
+    }
+
+    public void setMemployees(Employees memployees) {
+        this.memployees = memployees;
     }
 
 }

@@ -3,7 +3,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      >
+
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
     <!-- 10:12:52AM -->
     <h:body>
         <ui:composition> 
@@ -17,7 +19,156 @@
 
             </style>
             <h:form id="form_main_department">
-                department
+                <p:growl id="messages" />
+                <p:panel id="panel_command" visible="#{departmentController.isLogged }" >
+                    <p:commandButton value="Add Department" rendered="#{departmentController.status == 'SELECT'}" icon="ui-icon-plus" process="@this" actionListener="#{departmentController.addDepartment(event)}" update=":form_main_department:panel_list_department :form_main_department:panel_command :form_main_department:panel_form_department" />
+                </p:panel>
+                <p:panel id="panel_list_department" visible="#{departmentController.status == 'SELECT'}" >
+                    <p:dataTable value="#{departmentController.mlistDepartments}" var="departments" rowKey="#{departments.mdepartment.id}" paginator="true" paginatorPosition="bottom" rows="10" rowsPerPageTemplate="10,20,30"  >
+                        <f:facet name="header">
+                            List Department
+                        </f:facet>
+
+                        <p:column headerText="Department Code" style="width: 150px;" filterBy="#{departments.mdepartment.departmentCode}" sortBy="#{departments.mdepartment.departmentCode}" filterMatchMode="contains" >
+                            <h:outputText value="#{departments.mdepartment.departmentCode}" />
+                        </p:column>
+
+                        <p:column headerText="Name" style="width: 330px;" filterBy="#{departments.mdepartment.name}" sortBy="#{departments.mdepartment.name}" filterMatchMode="contains" >
+                            <h:outputText value="#{departments.mdepartment.name}" />
+                        </p:column>
+
+                        <p:column headerText="Employee Manager" style="width: 330px;"   >
+                            <h:outputText value="#{departments.nameEmployeeManager}" rendered="#{!(department.employeeId == 0)}" >
+                            </h:outputText>
+                        </p:column>
+                        <p:column id="control_list_employee" style="text-align: center;width: 330px;" >
+                            <p:commandButton value="Edit" icon="ui-icon-pencil" style="background: #64ffda; width: 90px; color: black;" process="@this" actionListener="#{departmentController.preEditDepartment(departments.mdepartment)}" update=":form_main_department:panel_list_department :form_main_department:panel_command :form_main_department:panel_form_department"  />
+                            <p:commandButton value="Delete" icon="ui-icon-trash" style="background: #ef9a9a; width: 90px; color: black;" process="@this" actionListener="#{departmentController.preDelete(departments.mdepartment)}" onclick="PF('dialog_delete').show();"  />
+                            <p:commandButton icon="ui-icon-search" title="Detail info department" oncomplete="PF('detail_department').show();"  process="@this" update=":form_main_department:dialog_detail_department" actionListener="#{departmentController.detailDepartment(departments.mdepartment)}" />
+                            <p:commandButton value="View list employee" title="Detail list employees's department" oncomplete="PF('detail_employees_department').show();"  process="@this" update=":form_main_department:dialog_list_employee_department" actionListener="#{departmentController.detailListEmployeeBelongDepartment(departments.mdepartment)}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+                <p:panel id="panel_form_department" visible="#{departmentController.status == 'CREATE'|| departmentController.status == 'UPDATE'}" style="margin-left: auto; margin-right: auto; width: 50%;"  >
+                    <p:panelGrid style="width: 100%;" >
+                        <p:row>
+                            <p:column >
+                                <h:outputText value="Department Code *" />
+                            </p:column>
+                            <p:column >
+                                <p:inputText required="true" value="#{departmentController.mdepartment.departmentCode}" requiredMessage="Department Code not empty" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column >
+                                <h:outputText value="Name *" />
+                            </p:column>
+                            <p:column >
+                                <p:inputText required="true" value="#{departmentController.mdepartment.name}" requiredMessage="Name not empty" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column >
+                                <h:outputText value="Office phone *" />
+                            </p:column>
+                            <p:column >
+                                <p:inputText required="true" value="#{departmentController.mdepartment.officePhone}" requiredMessage="Office phone have value from 8 to 15 number" >
+                                    <f:validateLength  minimum="8" maximum="15"  />
+                                    <f:validateRegex pattern="[0-9]*"  />
+                                </p:inputText>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column >
+                                <h:outputText value="Employee Manager" />
+                            </p:column>
+                            <p:column >
+                                <p:selectOneMenu value="#{departmentController.mdepartment.employeeId}" filter="true" filterMatchMode="startsWith" >
+                                    <f:selectItem itemLabel="--Select employee Manager--" />
+                                    <f:selectItems value="#{departmentController.mlistEmployeeNotBelongDepartment}" var="employee" itemLabel="#{employee.name } - #{employee.employeeCode}" itemValue="#{employee.id}"   />
+                                </p:selectOneMenu>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column colspan="2" style="text-align: center;" >
+                                <p:commandButton icon="ui-icon-arrow-1-w" value="Back" process="@this" actionListener="#{departmentController.backDepartment(event)}"  update=":form_main_department:panel_list_department :form_main_department:panel_command :form_main_department:panel_form_department" />
+                                <p:commandButton icon="ui-icon-disk" value="Save" process="@this :form_main_department:panel_form_department" actionListener="#{departmentController.save(event)}"  style="text-align: center;"  update=":form_main_department:panel_list_department :form_main_department:panel_command :form_main_department:panel_form_department :form_main_department:messages"  />
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                </p:panel>
+                <p:dialog id="dialog_detail_department" widgetVar="detail_department"  >
+                    <p:panelGrid style="width: 100%;" >
+                        <p:row>
+                            <p:column>
+                                <h:outputText value="Department Code" />
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{departmentController.mdepartment.departmentCode}" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                                <h:outputText value="Name" />
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{departmentController.mdepartment.name}" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                                <h:outputText value="Office Phone" />
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{departmentController.mdepartment.officePhone}" />
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                                <h:outputText value="Employee Manager" />
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{departmentController.mdepartment.employeeId}" rendered="#{!(departmentController.mdepartment.employeeId == 0) || departmentController.mdepartment.employeeId == department_detail.id }" >
+                                    <f:selectItems value="#{departmentController.mlistEmployeeNotBelongDepartment}" var="employee_detail" itemLabel="#{employee_detail.name}" itemValue="#{employee_detail.id}" />
+                                </h:outputText>
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                </p:dialog>
+                <p:dialog id="dialog_list_employee_department" widgetVar="detail_employees_department"  >
+                    <p:dataTable value="#{departmentController.mlistEmployeeBelongDepartment}" var="employee"  >
+
+
+                        <p:column headerText="Employee Code">
+                            <h:outputText value="#{employee.employeeCode}" />
+                        </p:column>
+
+
+                        <p:column headerText="Name">
+                            <h:outputText value="#{employee.name}" />
+                        </p:column>
+
+
+                        <p:column headerText="Email">
+                            <h:outputText value="#{employee.email}" />
+                        </p:column>
+
+
+                        <p:column headerText="Job title">
+                            <h:outputText value="#{employee.jobTitle}" />
+                        </p:column>
+
+
+                        <p:column headerText="Cell phone">
+                            <h:outputText value="#{employee.cellPhone}" />
+                        </p:column>
+
+                    </p:dataTable>
+                </p:dialog>
+                <p:confirmDialog widgetVar="dialog_delete"  severity="alert" header="Do you want delete department?">
+                    <p:commandButton value="Yes" icon="ui-icon-check" process="@this" actionListener="#{departmentController.deleteDepartment(event)}" oncomplete="PF('dialog_delete').hide();" update=":form_main_department:panel_list_department :form_main_department:panel_command :form_main_department:panel_form_department :form_main_department:messages" />
+                    <p:commandButton value="No" icon="ui-icon-close" onclick="PF('dialog_delete').hide();" />
+                </p:confirmDialog>
             </h:form>
         </ui:composition>
     </h:body>   
